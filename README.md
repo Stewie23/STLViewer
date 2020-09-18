@@ -17,6 +17,7 @@ Features
 *Search within filenames
 
 some features are missing
+
 *deleted files are not deleted form the database
 
 *more refined searchfeatures
