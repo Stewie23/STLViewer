@@ -129,3 +129,4 @@ stlDatabase.db
 doublefiles.txt
 .vscode/
 
+*.db-journal
