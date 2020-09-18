@@ -67,7 +67,7 @@ class DatabaseHandler(object):
         #get itemID with that tag from taggins
         returnList = []
         with self.con:
-            self.c.execute("SELECT itemID FROM Taggins WHERE tag =?",[tag])
+            self.c.execute("SELECT itemID FROM Taggins WHERE tag =? COLLATE NOCASE",[tag])
             data = self.c.fetchall()
             idList = []
             for entry in data:
