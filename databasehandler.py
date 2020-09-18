@@ -40,7 +40,7 @@ class DatabaseHandler(object):
                     #also set found to 1 
                     self.c.execute("UPDATE Items SET found=? WHERE itemID =?",(1,data[0][0]))
         #remove entrys that where not found 
-        self.c.execute("DELETE FROM Items WHERE found=0")
+        self.c.execute("DELETE FROM Items WHERE found=0")# TODO: Also remove from tags, also remove thumbnail from disk
         #reset found to zero for all entrys
         self.c.execute("UPDATE Items SET found=? WHERE found=?",(0,1))
  
