@@ -13,7 +13,8 @@ class DatabaseHandler(object):
 
     #if tables not exist create them, mostly needed for the first startup
     def checkTables(self):
-        self.c.execute('create table if not exists "Items" (itemID INTEGER PRIMARY KEY, name String, path String,hash String,thumbnail String)')
+       
+        self.c.execute('create table if not exists "Items" (itemID INTEGER PRIMARY KEY, name String, path String,hash String,thumbnail String,found INTEGER DEFAULT 0)')
         self.c.execute('create table if not exists "Taggins" (itemID integer, tag String)')
 
     def UpdateItemTable(self, mFileList):
@@ -26,7 +27,7 @@ class DatabaseHandler(object):
                 data=self.c.fetchall()
                 if len(data)==0:#no data found for that hash, generate entry
                     #generate entry
-                    self.c.execute("INSERT INTO Items(name,path,hash) VALUES (?,?,?)",entry)
+                    self.c.execute("INSERT INTO Items(name,path,hash,found) VALUES (?,?,?,1)",entry)
                     #get the id 
                     self.c.execute("SELECT * FROM Items WHERE hash = ?",[entry[2]])
                     data=self.c.fetchall()
@@ -36,6 +37,12 @@ class DatabaseHandler(object):
                 else:# entry exist compare path to see if renamed or moved 
                     if entry[1] != (data[0][2]):#update path 
                         self.c.execute("UPDATE Items SET path = ? , name = ? WHERE itemID =?",(entry[1],entry[0],data[0][0]))
+                    #also set found to 1 
+                    self.c.execute("UPDATE Items SET found=? WHERE itemID =?",(1,data[0][0]))
+        #remove entrys that where not found 
+        self.c.execute("DELETE FROM Items WHERE found=0")
+        #reset found to zero for all entrys
+        self.c.execute("UPDATE Items SET found=? WHERE found=?",(0,1))
  
     def getAllFilesThumbnails(self):
     #simply returns all the Thumbnails from the files
