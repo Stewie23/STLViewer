@@ -32,9 +32,12 @@ class App:
         self.left_frame = widgets.VerticalScrollFrame(root)
         self.left_frame.grid(row=1,sticky='nsew')
         #self.setupThumbnails(self.left_frame)
-        #right frame for displaying tags
+        #right frame for displaying tags, and additionial info
         right_frame = tk.Frame(root)
-        right_frame.grid(row=1,column=1)
+        right_frame.grid(row=1,column=1,sticky="nw")
+        #display # of search results
+        self.resultNumLable = tk.Label(right_frame, text="Results:")
+        self.resultNumLable.grid()
         w = tk.Label(right_frame, text="Tags")
         w.grid()
 
@@ -78,6 +81,8 @@ class App:
         #populating
         rn = 0
         cn = 0
+        #update result label
+        self.resultNumLable.config(text="Results: {}".format(len(listOfFiles)))
         for mFile in listOfFiles:
             if cn == self.columnumber-1:
                 cn = 0
