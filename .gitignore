@@ -124,7 +124,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 #custom
-#Thumbnails/*
+Thumbnails/*
 stlDatabase.db
 doublefiles.txt
 .vscode/
