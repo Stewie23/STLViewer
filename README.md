@@ -28,4 +28,5 @@ some features are missing:
 *manual crawling, crawling at startup
 
 planned features:
+
 *Hash changed but filename is known, dialog if new file should get the old tags
