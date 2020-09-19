@@ -47,13 +47,13 @@ class App:
         self.mDatabaseHandler = databasehandler.DatabaseHandler()
         self.Search = databasehandler.Search(self.mDatabaseHandler)
         #crawl the file sstem
-        #print("Crawling Filesystem ... this may take a while")
-        #mFileCrawler = filecrawler.FileCrawler("F:/3DPrinting")
-        #mFileList = mFileCrawler.crawl()
-        #print("Done Crawling Filesystem")        
+        print("Crawling Filesystem ... this may take a while")
+        mFileCrawler = filecrawler.FileCrawler("F:/3DPrinting")
+        mFileList = mFileCrawler.crawl()
+        print("Done Crawling Filesystem")        
         #feed the file list into the database
-        #print("Updating Database")
-        #self.mDatabaseHandler.UpdateItemTable(mFileList)
+        print("Updating Database")
+        self.mDatabaseHandler.UpdateItemTable(mFileList)
         #passing the inital list of files to the thumbnails
         self.setupThumbnails(self.mDatabaseHandler.getAllFilesThumbnails())
 

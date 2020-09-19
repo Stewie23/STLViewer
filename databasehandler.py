@@ -4,6 +4,7 @@ Handles the database
 import sqlite3 as sl
 import thumbnailgenerator 
 import re
+import os
 
 class DatabaseHandler(object):
     def __init__ (self):
@@ -39,8 +40,18 @@ class DatabaseHandler(object):
                         self.c.execute("UPDATE Items SET path = ? , name = ? WHERE itemID =?",(entry[1],entry[0],data[0][0]))
                     #also set found to 1 
                     self.c.execute("UPDATE Items SET found=? WHERE itemID =?",(1,data[0][0]))
-        #remove entrys that where not found 
-        self.c.execute("DELETE FROM Items WHERE found=0")# TODO: Also remove from tags, also remove thumbnail from disk
+        self.cleanUpTables()
+    
+    def cleanUpTables(self):
+        #first clean up taggins table and thumbnail folder
+        self.c.execute("SELECT itemID FROM Items WHERE found = 0")
+        data=self.c.fetchall()
+        for id in data:
+            self.c.execute("DELETE FROM Taggins WHERE itemID=?",[id[0]])
+            #thumbnail is itemID.jpg
+            os.remove("Thumbnails/{}.jpg".format(id[0]))
+        # finaly remove entrys that where not found 
+        self.c.execute("DELETE FROM Items WHERE found=0")
         #reset found to zero for all entrys
         self.c.execute("UPDATE Items SET found=? WHERE found=?",(0,1))
  
