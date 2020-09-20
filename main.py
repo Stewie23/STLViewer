@@ -20,12 +20,12 @@ class App:
         def Crawl():
             #crawl the file system if theres a folder defined
             if self.config["Folder"] != "":
-                messagebox.showinfo("Crawling Folder: {} this may take a while ...".format(self.config["Folder"]))
+                messagebox.showinfo("Crawling","Crawling Folder: {} this may take a while\nPress okay to Start".format(self.config["Folder"]))
                 mFileCrawler = filecrawler.FileCrawler(self.config["Folder"])
                 mFileList = mFileCrawler.crawl()     
                 self.mDatabaseHandler.UpdateItemTable(mFileList)
                 self.setupThumbnails(self.mDatabaseHandler.getAllFilesThumbnails())
-                messagebox.showinfo("Done")
+                messagebox.showinfo("Crawling","Done")
             else:
                 messagebox.showinfo("No Folder to crawl", "Please define a Folder in the Settings before Crawling")
 

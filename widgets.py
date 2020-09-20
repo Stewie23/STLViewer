@@ -287,6 +287,7 @@ class SettingsDialog(Dialog):
         self.config = config
         self.CrawlVar = tk.IntVar()
         self.directory =""
+        self.oldFolder = self.config["Folder"]
         self.Button = None
         Dialog.__init__(self,parent,title="Settings")
 
@@ -315,7 +316,7 @@ class SettingsDialog(Dialog):
             self.config["CrawlOnStartup"] = "True"
         else:
             self.config["CrawlOnStartup"] = "False"
-        if self.config["Folder"] != "":#warning if folder changed from no folder
+        if self.config["Folder"] != "" and self.config["Folder"] != self.oldFolder:#warning if folder changed from no folder
             messagebox.showinfo("Folder Changed","Folder Changed, consider making a backup of stlDatabase.db\nFiles not found during the next crawl will be removed from the database") 
         self.config["Folder"] = self.directory
         #save config changes to file
