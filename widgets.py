@@ -9,6 +9,7 @@ except:
 
 import os
 import subprocess
+import thumbnailgenerator
 FILEBROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')#only works for windows
 
 class Thumbnail(tk.Frame):
@@ -156,13 +157,13 @@ class VerticalScrollFrame(ttk.Frame):
 class Dialog(tk.Toplevel):
     #a base class for dialog windows
     # https://effbot.org/tkinterbook/tkinter-dialog-windows.htm
-    def __init__(self, parent,databaseHandler,itemID, title = None):
+    def __init__(self, parent,databaseHandler,itemID,widget, title = None):
 
         tk.Toplevel.__init__(self, parent)
         self.transient(parent)
         self.itemID = itemID
         self.databaseHandler  = databaseHandler
-
+        self.widget = widget
         if title:
             self.title(title)
 
@@ -247,7 +248,7 @@ class Dialog(tk.Toplevel):
 
 class MyDialog(Dialog):
 
-    def body(self, master):
+    def body(self,master):
         self.mButtonExplorer = tk.Button(master,text="Reveale in File Explorer",command=self.showExplorer).grid(row=0)
         self.mButtonThumb = tk.Button(master,text="Edit Thumbnail",command=self.editThumbnail).grid(row=1)
         tk.Label(master,text="Tags (Seperated by ,):").grid(row=2)
@@ -273,4 +274,4 @@ class MyDialog(Dialog):
         subprocess.run([FILEBROWSER_PATH, '/select,', os.path.normpath(path)]) #only works for windows!
     
     def editThumbnail(self):
-        pass
+        thumbnailgenerator.createManualThumb(self.itemID,self.databaseHandler.getPathbyID(self.itemID)[0][0],self.widget)

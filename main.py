@@ -48,18 +48,18 @@ class App:
         self.Search = databasehandler.Search(self.mDatabaseHandler)
         #crawl the file sstem
         print("Crawling Filesystem ... this may take a while")
-        mFileCrawler = filecrawler.FileCrawler("F:/3DPrinting")
-        mFileList = mFileCrawler.crawl()
+        #mFileCrawler = filecrawler.FileCrawler("F:/3DPrinting")
+        #mFileList = mFileCrawler.crawl()
         print("Done Crawling Filesystem")        
         #feed the file list into the database
         print("Updating Database")
-        self.mDatabaseHandler.UpdateItemTable(mFileList)
+        #self.mDatabaseHandler.UpdateItemTable(mFileList)
         #passing the inital list of files to the thumbnails
         self.setupThumbnails(self.mDatabaseHandler.getAllFilesThumbnails())
 
 
     def setupSearchbar(self,frame):
-    #creating the searchbar
+    #creating the searchbar 
         v = tk.StringVar()
         searchbar = tk.Entry(frame,textvariable=v,width=100)
         searchbar.grid(row=0)
@@ -99,9 +99,8 @@ class App:
             cn += 1
 
     def callbackLabel(self,event):
-        widgets.MyDialog(self.root,self.mDatabaseHandler,event.widget.master.itemID)#also pass the itemID to the dialog
-
-  
+        widgets.MyDialog(self.root,self.mDatabaseHandler,event.widget.master.itemID,event.widget.master)#also pass the itemID to the dialog
+ 
     def resizeEvent(self,event):
         #based on the width, determin how many thumbnails are displayed in a row
         #a thumbnail beeing 150X150px,havging a 4px of border (in total) 
