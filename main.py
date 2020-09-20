@@ -82,10 +82,11 @@ class App:
             #use settings
             self.config = json.load(open("settings.json", "r"))
         else:
-            #generate and set flag so user can set them
+            #generate empty and load
             f = open("settings.json", "a")
             f.write("{\n \"Folder\":\"\",\n\"CrawlOnStartup\":\"False\"\n}")
             f.close()
+            self.config = json.load(open("settings.json", "r"))
 
 
     def setupSearchbar(self,frame):
