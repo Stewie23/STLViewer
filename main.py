@@ -15,8 +15,8 @@ class App:
 
     def __init__(self,root):
         def SettingsDialog():
-            #open the settings dialog
-            print("Foo")
+             widgets.SettingsDialog(self.root,self.config)#also pass the itemID to the dialog
+            
         def Crawl():
             #crawl the file system if theres a folder defined
             if self.config["Folder"] != "":

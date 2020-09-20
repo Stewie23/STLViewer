@@ -17,12 +17,6 @@ Deleted or edited files, as editing would change their hash,will be removed from
 
 * Search within filenames
 
-**some features are missing:**
-
-* changing the folder that is crawled
-
-* manual crawling, crawling at startup
-
 **planned features:**
 
 * more refined searchfeatures

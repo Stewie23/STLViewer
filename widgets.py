@@ -10,6 +10,8 @@ except:
 import os
 import subprocess
 import thumbnailgenerator
+from tkinter import filedialog,messagebox
+import json
 FILEBROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')#only works for windows
 
 class Thumbnail(tk.Frame):
@@ -249,10 +251,7 @@ class MyDialog(Dialog):
         self.itemID = itemID
         self.databaseHandler  = databaseHandler
         self.widget = widget
-        
         Dialog.__init__(self,parent,title=title)
-
-        
 
     def body(self,master):
         self.mButtonExplorer = tk.Button(master,text="Reveale in File Explorer",command=self.showExplorer).grid(row=0)
@@ -281,3 +280,46 @@ class MyDialog(Dialog):
     
     def editThumbnail(self):
         thumbnailgenerator.createManualThumb(self.itemID,self.databaseHandler.getPathbyID(self.itemID)[0][0],self.widget)
+
+class SettingsDialog(Dialog):
+
+    def __init__(self,parent,config):
+        self.config = config
+        self.CrawlVar = tk.IntVar()
+        self.directory =""
+        self.Button = None
+        Dialog.__init__(self,parent,title="Settings")
+
+    def body(self,master):
+        #checkbox for crawling on startup or not
+        self.CrawlVar  = tk.IntVar()
+        if self.config["CrawlOnStartup"] == "True":
+            self.CrawlVar.set(1)
+        else:
+            self.CrawlVar.set(0)
+
+        c = tk.Checkbutton(master, text="Crawl on Startup", variable=self.CrawlVar)
+        c.grid()
+        #folder to crawl
+        self.directory = self.config["Folder"]
+        tk.Label(master,text="Folder to Crawl:").grid(row=1,column=0)
+        self.Button = tk.Button(master,text=self.directory,command=self.selectFile)
+        self.Button.grid(row=1,column=1)
+
+    def selectFile(self):
+        self.directory = filedialog.askdirectory()
+        self.Button.configure(text=self.directory)
+
+    def apply(self):
+        if self.CrawlVar.get() == 1:
+            self.config["CrawlOnStartup"] = "True"
+        else:
+            self.config["CrawlOnStartup"] = "False"
+        if self.config["Folder"] != "":#warning if folder changed from no folder
+            messagebox.showinfo("Folder Changed","Folder Changed, consider making a backup of stlDatabase.db\nFiles not found during the next crawl will be removed from the database") 
+        self.config["Folder"] = self.directory
+        #save config changes to file
+        with open('settings.json', 'w') as outfile:
+            json.dump(self.config, outfile)
+
+        
