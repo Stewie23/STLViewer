@@ -157,13 +157,10 @@ class VerticalScrollFrame(ttk.Frame):
 class Dialog(tk.Toplevel):
     #a base class for dialog windows
     # https://effbot.org/tkinterbook/tkinter-dialog-windows.htm
-    def __init__(self, parent,databaseHandler,itemID,widget, title = None):
+    def __init__(self, parent,title = None):
 
         tk.Toplevel.__init__(self, parent)
         self.transient(parent)
-        self.itemID = itemID
-        self.databaseHandler  = databaseHandler
-        self.widget = widget
         if title:
             self.title(title)
 
@@ -247,6 +244,15 @@ class Dialog(tk.Toplevel):
         pass # override
 
 class MyDialog(Dialog):
+
+    def __init__(self,parent,databaseHandler,itemID,widget,title= None):
+        self.itemID = itemID
+        self.databaseHandler  = databaseHandler
+        self.widget = widget
+        
+        Dialog.__init__(self,parent,title=title)
+
+        
 
     def body(self,master):
         self.mButtonExplorer = tk.Button(master,text="Reveale in File Explorer",command=self.showExplorer).grid(row=0)

@@ -29,10 +29,8 @@ class App:
             else:
                 messagebox.showinfo("No Folder to crawl", "Please define a Folder in the Settings before Crawling")
 
-
         self.config = ""
         self.checkConfig()
-
         frame = tk.Frame(root)
         self.root = root
         self.root.minsize(300,300)
@@ -52,7 +50,6 @@ class App:
         root.columnconfigure(1,weight=0,minsize=200)
         root.rowconfigure(1,weight=1)
         self.setupSearchbar(top_frame)
-
         #the thumnail frame
         self.left_frame = widgets.VerticalScrollFrame(root)
         self.left_frame.grid(row=1,sticky='nsew')
