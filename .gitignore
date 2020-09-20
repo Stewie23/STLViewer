@@ -130,3 +130,4 @@ doublefiles.txt
 .vscode/
 
 *.db-journal
+settings.json

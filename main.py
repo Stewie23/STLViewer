@@ -1,13 +1,38 @@
 import tkinter as tk
+from tkinter import messagebox
 import pathlib
 from PIL import Image, ImageTk
 import widgets
 import math
 import filecrawler
 import databasehandler
+import os
+import json
+
 class App:
 
+
+
     def __init__(self,root):
+        def SettingsDialog():
+            #open the settings dialog
+            print("Foo")
+        def Crawl():
+            #crawl the file system if theres a folder defined
+            if self.config["Folder"] != "":
+                messagebox.showinfo("Crawling Folder: {} this may take a while ...".format(self.config["Folder"]))
+                mFileCrawler = filecrawler.FileCrawler(self.config["Folder"])
+                mFileList = mFileCrawler.crawl()     
+                self.mDatabaseHandler.UpdateItemTable(mFileList)
+                self.setupThumbnails(self.mDatabaseHandler.getAllFilesThumbnails())
+                messagebox.showinfo("Done")
+            else:
+                messagebox.showinfo("No Folder to crawl", "Please define a Folder in the Settings before Crawling")
+
+
+        self.config = ""
+        self.checkConfig()
+
         frame = tk.Frame(root)
         self.root = root
         self.root.minsize(300,300)
@@ -15,10 +40,10 @@ class App:
         self.columnumber = 0 
         self.root.bind("<Configure>" ,self.resizeEvent)
         frame.grid()
-
         # create a toplevel menu
         menubar = tk.Menu(root)
-        menubar.add_command(label="Dummy!")
+        menubar.add_command(label="Settings", command=SettingsDialog)
+        menubar.add_command(label="Crawl",command=Crawl)
         root.config(menu=menubar)
         #creating frames for handling the layout (top,left,right)
         top_frame = tk.Frame(root) 
@@ -43,19 +68,27 @@ class App:
 
         #after setting up the basic gui. crawl and set up the database
         #init database
-        print("Initialising Database..")
+        #print("Initialising Database..")
         self.mDatabaseHandler = databasehandler.DatabaseHandler()
         self.Search = databasehandler.Search(self.mDatabaseHandler)
-        #crawl the file sstem
-        print("Crawling Filesystem ... this may take a while")
-        mFileCrawler = filecrawler.FileCrawler("F:/3DPrinting")
-        mFileList = mFileCrawler.crawl()
-        print("Done Crawling Filesystem")        
-        #feed the file list into the database
-        print("Updating Database")
-        self.mDatabaseHandler.UpdateItemTable(mFileList)
-        #passing the inital list of files to the thumbnails
-        self.setupThumbnails(self.mDatabaseHandler.getAllFilesThumbnails())
+        if self.config["CrawlOnStartup"] == "True":
+            Crawl()         
+        else:
+            #passing the inital list of files to the thumbnails
+            self.setupThumbnails(self.mDatabaseHandler.getAllFilesThumbnails())
+
+   
+
+    def checkConfig(self):
+        #look for a config file, if exist use it if not generate and set flag for settings dialog
+        if os.path.isfile("settings.json") == True:
+            #use settings
+            self.config = json.load(open("settings.json", "r"))
+        else:
+            #generate and set flag so user can set them
+            f = open("settings.json", "a")
+            f.write("{\n \"Folder\":\"\",\n\"CrawlOnStartup\":\"False\"\n}")
+            f.close()
 
 
     def setupSearchbar(self,frame):
