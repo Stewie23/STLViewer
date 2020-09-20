@@ -112,6 +112,13 @@ def WriteImage(fileName, renWin, rgba=True):
 
     import os
 
+    #check für /Thumbnails folder
+
+    if os.path.exists("Thumbnails") == True:
+        pass
+    else:
+        os.mkdir("Thumbnails")
+
     if fileName:
         writer = vtk.vtkJPEGWriter()
         windowto_image_filter = vtk.vtkWindowToImageFilter()
