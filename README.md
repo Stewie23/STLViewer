@@ -2,31 +2,29 @@
 Shows STL Files from a Folder with Preview Pictures (using VTK), and points to them in the Explorer.
 Probably just works with Windows for now.
 
-Features:
+**Features:**
 
-*Finds all .stl Files within a folder and all its subfolders and stores their hashes, files can be moved or renamed and still will be found.
+* Finds all .stl Files within a folder and all its subfolders and stores their hashes, files can be moved or renamed and still will be found.
 Deleted or edited files, as editing would change their hash,will be removed from the database
 
-*Points to the Files in the Windows Explorer
+* Points to the Files in the Windows Explorer
 
-*Generates a Preview Picture
+* Automaticaly Generates a Preview Picture, since this will often be from a wierd angle, the picture can be manualy edited. 
 
-*Allows to asign Tags to Files
+* Allows to asign Tags to Files
 
-*Search for Tags via  []
+* Search for Tags via  []
 
-*Search within filenames
+* Search within filenames
 
-some features are missing:
+**some features are missing:**
 
-*more refined searchfeatures
+* changing the folder that is crawled
 
-*manipulating the preview picture
+* manual crawling, crawling at startup
 
-*changing the folder that is crawled
+**planned features:**
 
-*manual crawling, crawling at startup
+* more refined searchfeatures
 
-planned features:
-
-*Hash changed but filename is known, dialog if new file should get the old tags
+* Hash changed but filename is known, dialog if new file should get the old tags
