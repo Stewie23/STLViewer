@@ -144,10 +144,6 @@ class App:
                 widget.grid(row=rn,column=cn)
                 cn+=1
 
-     
-        
-        
-
 root = tk.Tk()
 root.title("STL Viewer")
 app = App(root)

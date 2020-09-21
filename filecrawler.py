@@ -24,7 +24,7 @@ class FileCrawler(object):
         self.folder = folder 
         self.MySTLList = []
 
-    def crawl(self):
+    def crawl(self,progressbar):
         doubleLog = open("doublefiles.txt","w")
         listOfFiles = list(pathlib.Path(self.folder).glob('**/*.stl'))
         for file in listOfFiles:
@@ -39,6 +39,9 @@ class FileCrawler(object):
                 self.MySTLList.append(entry)
             else:
                 doubleLog.write("Ignoring Duplicated File: {} \n".format(entry[1]))
+            #also update progressbar
+            progressbar["value"] += 1
+            progressbar.update()
         doubleLog.close()
         return self.MySTLList
 

@@ -222,10 +222,9 @@ class Dialog(tk.Toplevel):
             self.initial_focus.focus_set() # put focus back
             return
 
+        self.apply()
         self.withdraw()
         self.update_idletasks()
-
-        self.apply()
 
         self.cancel()
 
@@ -329,15 +328,19 @@ class CrawlingDialog(Dialog):
     def __init__(self,parent,config,databasehandler):
         self.config = config
         self.mDatabaseHandler = databasehandler
+        self.progressbar = None
         self.mFileCrawler = filecrawler.FileCrawler(self.config["Folder"])
-
         Dialog.__init__(self,parent,title="Crawling")
 
     def body(self,master):
-        tk.Label(master,text="Crawling Folder: {} containing {} Files.\nThis may take a while\nPress apply to Start".format(self.config["Folder"],filecrawler.getFileNumber(self.config["Folder"]))).grid()
-    
+        tk.Label(master,text="Crawling Folder: {} containing {} Files.\nThis may take a while\nPress apply to Start".format(self.config["Folder"],filecrawler.getFileNumber(self.config["Folder"]))).grid()          
+        self.progressbar= tk.ttk.Progressbar(master,orient="horizontal",length=300,mode="determinate")
+        self.progressbar.grid()
+        self.progressbar["value"]=0
+        self.progressbar["maximum"]=filecrawler.getFileNumber(self.config["Folder"])
+
     def apply(self):
-        mFileList = self.mFileCrawler.crawl()     
+        mFileList = self.mFileCrawler.crawl(self.progressbar)
         self.result =  self.mDatabaseHandler.UpdateItemTable(mFileList)
 
 
