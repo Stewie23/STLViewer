@@ -10,6 +10,7 @@ except:
 import os
 import subprocess
 import thumbnailgenerator
+import filecrawler
 from tkinter import filedialog,messagebox
 import json
 FILEBROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')#only works for windows
@@ -323,4 +324,19 @@ class SettingsDialog(Dialog):
         with open('settings.json', 'w') as outfile:
             json.dump(self.config, outfile)
 
-        
+class CrawlingDialog(Dialog):
+    
+    def __init__(self,parent,config,databasehandler):
+        self.config = config
+        self.mDatabaseHandler = databasehandler
+        Dialog.__init__(self,parent,title="Crawling")
+
+    def body(self,master):
+        tk.Label(master,text="Crawling Folder: {} this may take a while\nPress apply to Start".format(self.config["Folder"])).grid()
+    
+    def apply(self):
+        mFileCrawler = filecrawler.FileCrawler(self.config["Folder"])
+        mFileList = mFileCrawler.crawl()     
+        self.result =  self.mDatabaseHandler.UpdateItemTable(mFileList)
+
+

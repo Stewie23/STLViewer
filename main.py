@@ -11,8 +11,6 @@ import json
 
 class App:
 
-
-
     def __init__(self,root):
         def SettingsDialog():
              widgets.SettingsDialog(self.root,self.config)#also pass the itemID to the dialog
@@ -20,12 +18,9 @@ class App:
         def Crawl():
             #crawl the file system if theres a folder defined
             if self.config["Folder"] != "":
-                messagebox.showinfo("Crawling","Crawling Folder: {} this may take a while\nPress okay to Start".format(self.config["Folder"]))
-                mFileCrawler = filecrawler.FileCrawler(self.config["Folder"])
-                mFileList = mFileCrawler.crawl()     
-                self.mDatabaseHandler.UpdateItemTable(mFileList)
-                self.setupThumbnails(self.mDatabaseHandler.getAllFilesThumbnails())
-                messagebox.showinfo("Crawling","Done")
+                mDialog = widgets.CrawlingDialog(self.root,self.config,self.mDatabaseHandler)
+                if mDialog.result != None:
+                    self.setupThumbnails(mDialog.result)
             else:
                 messagebox.showinfo("No Folder to crawl", "Please define a Folder in the Settings before Crawling")
 
