@@ -329,14 +329,15 @@ class CrawlingDialog(Dialog):
     def __init__(self,parent,config,databasehandler):
         self.config = config
         self.mDatabaseHandler = databasehandler
+        self.mFileCrawler = filecrawler.FileCrawler(self.config["Folder"])
+
         Dialog.__init__(self,parent,title="Crawling")
 
     def body(self,master):
-        tk.Label(master,text="Crawling Folder: {} this may take a while\nPress apply to Start".format(self.config["Folder"])).grid()
+        tk.Label(master,text="Crawling Folder: {} containing {} Files.\nThis may take a while\nPress apply to Start".format(self.config["Folder"],filecrawler.getFileNumber(self.config["Folder"]))).grid()
     
     def apply(self):
-        mFileCrawler = filecrawler.FileCrawler(self.config["Folder"])
-        mFileList = mFileCrawler.crawl()     
+        mFileList = self.mFileCrawler.crawl()     
         self.result =  self.mDatabaseHandler.UpdateItemTable(mFileList)
 
 

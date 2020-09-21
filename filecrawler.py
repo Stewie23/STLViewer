@@ -4,6 +4,17 @@ import pathlib
 import hashlib
 import os
 
+'helper function to get file number in folder and subfolder'
+def getFileNumber(folder):
+    count = 0
+    for filename in os.listdir(folder):
+        path = os.path.join(folder, filename)
+        if os.path.isfile(path):
+            count += 1
+        elif os.path.isdir(path):
+            count += getFileNumber(path)
+    return count
+
 """
 goes trough a folder and looks for .stl files, put them into a list 
 returns a nestet list containing name,folder and hash
@@ -13,7 +24,6 @@ class FileCrawler(object):
         self.folder = folder 
         self.MySTLList = []
 
-    
     def crawl(self):
         doubleLog = open("doublefiles.txt","w")
         listOfFiles = list(pathlib.Path(self.folder).glob('**/*.stl'))
