@@ -18,9 +18,8 @@ class App:
         def Crawl():
             #crawl the file system if theres a folder defined
             if self.config["Folder"] != "":
-                mDialog = widgets.CrawlingDialog(self.root,self.config,self.mDatabaseHandler)
-                if mDialog.result != None:
-                    self.setupThumbnails(mDialog.result)
+                widgets.CrawlingDialog(self.root,self.config,self.mDatabaseHandler)
+                self.setupThumbnails(self.mDatabaseHandler.getAllFilesThumbnails())
             else:
                 messagebox.showinfo("No Folder to crawl", "Please define a Folder in the Settings before Crawling")
 

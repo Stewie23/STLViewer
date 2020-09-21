@@ -341,6 +341,6 @@ class CrawlingDialog(Dialog):
 
     def apply(self):
         mFileList = self.mFileCrawler.crawl(self.progressbar)
-        self.result =  self.mDatabaseHandler.UpdateItemTable(mFileList)
+        self.mDatabaseHandler.UpdateItemTable(mFileList)
 
 
