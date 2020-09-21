@@ -22,3 +22,7 @@ Deleted or edited files, as editing would change their hash,will be removed from
 * more refined searchfeatures
 
 * Hash changed but filename is known, dialog if new file should get the old tags
+
+**Known Problems:**
+
+* Having a manual Thumbwindow open an manipulating the Dialogmenu does not work well
