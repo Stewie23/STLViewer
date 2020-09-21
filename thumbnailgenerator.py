@@ -25,7 +25,6 @@ class KeyPressInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
             self.widget.mImage.image = photo#reference keeping
             self.widget.mImage.configure(image=photo) 
 
-
 def createAutoThumb(filename,path):
     colors = vtk.vtkNamedColors()
 
