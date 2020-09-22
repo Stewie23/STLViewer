@@ -47,7 +47,10 @@ class TagList(tk.Frame):
             widget.destroy()
         tk.Label(self,text="Tags").grid()
     def appendTag(self,tagname,tagnumber):
-        tk.Label(self,text="{} : ({})".format(tagname,tagnumber)).grid()
+        mLabel = tk.Label(self,text="{} : ({})".format(tagname,tagnumber))
+        mLabel.grid()
+        #add command to do a search for that tag
+        return mLabel
 
 class VerticalScrollFrame(ttk.Frame):
     """A ttk frame allowing vertical scrolling only.

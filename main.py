@@ -32,6 +32,7 @@ class App:
         self.columnumber = 0 
         self.root.bind("<Configure>" ,self.resizeEvent)
         frame.grid()
+        self.searchvariable = tk.StringVar()
         # create a toplevel menu
         menubar = tk.Menu(root)
         menubar.add_command(label="Settings", command=SettingsDialog)
@@ -57,7 +58,8 @@ class App:
         #tag widget
         self.TagWidget = widgets.TagList(self.right_frame)
         self.TagWidget.grid()
-
+        #search variable
+        
         #after setting up the basic gui. crawl and set up the database
         #init database
         #print("Initialising Database..")
@@ -83,19 +85,29 @@ class App:
             self.config = json.load(open("settings.json", "r"))
 
     def setupSearchbar(self,frame):
-    #creating the searchbar 
-        v = tk.StringVar()
-        searchbar = tk.Entry(frame,textvariable=v,width=100)
+        #creating the searchbar 
+        searchbar = tk.Entry(frame,textvariable=self.searchvariable,width=100)
         searchbar.grid(row=0)
-        searchbar.bind("<Key>",lambda event,a=v,b=searchbar: self.sendSearchString(event,a,b))
-        v.set("Search")
-        searchbar = v.get()
+        searchbar.bind("<Key>",lambda event,a=self.searchvariable,b=searchbar: self.sendSearchString(event,a,b))
+        self.searchvariable.set("Search")
+        searchbar = self.searchvariable.get()
 
     def sendSearchString(self,event,stringVar,entry):
         if event.keysym == "Return":#user hit return get searching
             returnList = self.Search.query(entry.get())
             self.setupThumbnails(returnList)
-        
+
+    def doSearch(self,event):
+        query = event.widget.cget("text") 
+        #remove number and strip
+        query = query.split(":")[0]
+        query = query.strip()
+        #do a search thats not happend via the searchbar 
+        returnList = self.Search.query("["+query+"]")   
+        self.setupThumbnails(returnList)
+        #also set the searchbar text to reflext the search
+        self.searchvariable.set("["+query+"]")
+
     def setupThumbnails(self,listOfFiles):
         #reset first
         for item in self.left_frame.interior.winfo_children():
@@ -126,7 +138,8 @@ class App:
         #updating the list of tags and their numbers
         tags = self.mDatabaseHandler.getTagNumbers()
         for entry in tags:
-            self.TagWidget.appendTag(entry[0],entry[1])
+            Label = self.TagWidget.appendTag(entry[0],entry[1])
+            Label.bind("<Button-1>",self.doSearch)
 
     def callbackLabel(self,event):
         widgets.MyDialog(self.root,self.mDatabaseHandler,event.widget.master.itemID,event.widget.master)#also pass the itemID to the dialog
