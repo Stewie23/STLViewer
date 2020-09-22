@@ -49,13 +49,14 @@ class App:
         self.left_frame.grid(row=1,sticky='nsew')
         #self.setupThumbnails(self.left_frame)
         #right frame for displaying tags, and additionial info
-        right_frame = tk.Frame(root)
-        right_frame.grid(row=1,column=1,sticky="nw")
+        self.right_frame = tk.Frame(root)
+        self.right_frame.grid(row=1,column=1,sticky="nw")
         #display # of search results
-        self.resultNumLable = tk.Label(right_frame, text="Results:")
+        self.resultNumLable = tk.Label(self.right_frame, text="Results:")
         self.resultNumLable.grid()
-        w = tk.Label(right_frame, text="Tags")
-        w.grid()
+        #tag widget
+        self.TagWidget = widgets.TagList(self.right_frame)
+        self.TagWidget.grid()
 
         #after setting up the basic gui. crawl and set up the database
         #init database
@@ -68,8 +69,7 @@ class App:
             #passing the inital list of files to the thumbnails
             self.setupThumbnails(self.mDatabaseHandler.getAllFilesThumbnails())
 
-   
-
+        self.updateSidebar()
     def checkConfig(self):
         #look for a config file, if exist use it if not generate and set flag for settings dialog
         if os.path.isfile("settings.json") == True:
@@ -82,7 +82,6 @@ class App:
             f.close()
             self.config = json.load(open("settings.json", "r"))
 
-
     def setupSearchbar(self,frame):
     #creating the searchbar 
         v = tk.StringVar()
@@ -92,13 +91,11 @@ class App:
         v.set("Search")
         searchbar = v.get()
 
-
     def sendSearchString(self,event,stringVar,entry):
         if event.keysym == "Return":#user hit return get searching
             returnList = self.Search.query(entry.get())
             self.setupThumbnails(returnList)
         
-
     def setupThumbnails(self,listOfFiles):
         #reset first
         for item in self.left_frame.interior.winfo_children():
@@ -108,6 +105,7 @@ class App:
         cn = 0
         #update result label
         self.resultNumLable.config(text="Results: {}".format(len(listOfFiles)))
+        #build the actual thumbnails
         for mFile in listOfFiles:
             if cn == self.columnumber-1:
                 cn = 0
@@ -123,8 +121,16 @@ class App:
             l.mName.bind("<Button-1>",self.callbackLabel)
             cn += 1
 
+    def updateSidebar(self):
+        self.TagWidget.clearTags()
+        #updating the list of tags and their numbers
+        tags = self.mDatabaseHandler.getTagNumbers()
+        for entry in tags:
+            self.TagWidget.appendTag(entry[0],entry[1])
+
     def callbackLabel(self,event):
         widgets.MyDialog(self.root,self.mDatabaseHandler,event.widget.master.itemID,event.widget.master)#also pass the itemID to the dialog
+        self.updateSidebar()
  
     def resizeEvent(self,event):
         #based on the width, determin how many thumbnails are displayed in a row

@@ -123,7 +123,19 @@ class DatabaseHandler(object):
         for tag in tagList:
             with self.con:
                 self.c.execute("INSERT INTO Taggins(itemID,tag) VALUES (?,?)",(mID,tag.strip()))
-             
+
+    def getTagNumbers(self):
+        #get Tag + how often it is used
+        ReturnList = []
+        with self.con:
+            self.c.execute("SELECT tag FROM Taggins")
+            Tags = self.c.fetchall()#list of all tags
+            TagsUnique = list(dict.fromkeys(Tags))#remove duplicates by dict
+        for entry in TagsUnique:
+            amount= Tags.count(entry)
+            ReturnList.append([entry[0],amount])
+        return sorted(ReturnList, key=lambda tag: tag[1],reverse=True)
+
 class Search(object):
     #handles the translation of the search term into database querys
     def __init__ (self,databasemanager):

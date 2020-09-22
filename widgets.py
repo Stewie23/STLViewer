@@ -36,6 +36,19 @@ class Thumbnail(tk.Frame):
 
         self.mName.grid()
 
+class TagList(tk.Frame):
+    #a frame holding a list of tags, implemented as a separte widget for easier manipulation
+    def __init__(self,parent,*args,**options):
+        tk.Frame.__init__(self,parent)
+        tk.Label(self,text="Tags").grid()
+    
+    def clearTags(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+        tk.Label(self,text="Tags").grid()
+    def appendTag(self,tagname,tagnumber):
+        tk.Label(self,text="{} : ({})".format(tagname,tagnumber)).grid()
+
 class VerticalScrollFrame(ttk.Frame):
     """A ttk frame allowing vertical scrolling only.
     Use the '.interior' attribute to place widgets inside the scrollable frame.
