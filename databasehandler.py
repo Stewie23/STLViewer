@@ -136,6 +136,22 @@ class DatabaseHandler(object):
             ReturnList.append([entry[0],amount])
         return sorted(ReturnList, key=lambda tag: tag[1],reverse=True)
 
+    def getItemsWithoutTag(self):
+        #return items that have currently no tag 
+        with self.con:
+            ReturnList = []
+            #get all ids in use
+            self.c.execute("SELECT itemID FROM Items")
+            data = self.c.fetchall()
+            #check if id is in taggins if not keep
+            for item in data:
+                self.c.execute("SELECT itemID FROM taggins WHERE itemID = ?",item)
+                data = self.c.fetchall()
+                if len(data) == 0 :
+                    result = self.getAllbyID(item[0])
+                    ReturnList.append(tuple(result[0]))
+        return tuple(ReturnList)
+
 class Search(object):
     #handles the translation of the search term into database querys
     def __init__ (self,databasemanager):

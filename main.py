@@ -108,6 +108,11 @@ class App:
         #also set the searchbar text to reflext the search
         self.searchvariable.set("["+query+"]")
 
+    def NoTagSearch(self,event):
+        returnList = self.mDatabaseHandler.getItemsWithoutTag()
+        self.setupThumbnails(returnList)
+        self.searchvariable.set("[NoTag]")
+
     def setupThumbnails(self,listOfFiles):
         #reset first
         for item in self.left_frame.interior.winfo_children():
@@ -137,6 +142,8 @@ class App:
         self.TagWidget.clearTags()
         #updating the list of tags and their numbers
         tags = self.mDatabaseHandler.getTagNumbers()
+        noTagLable = self.TagWidget.setNoTags(len(self.mDatabaseHandler.getItemsWithoutTag()))
+        noTagLable.bind("<Button-1>",self.NoTagSearch)
         for entry in tags:
             Label = self.TagWidget.appendTag(entry[0],entry[1])
             Label.bind("<Button-1>",self.doSearch)

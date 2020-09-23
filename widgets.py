@@ -46,6 +46,12 @@ class TagList(tk.Frame):
         for widget in self.winfo_children():
             widget.destroy()
         tk.Label(self,text="Tags").grid()
+
+    def setNoTags(self,number):
+        noTagLabel = tk.Label(self,text="Items Without Tag: {}".format(number))
+        noTagLabel.grid()
+        return noTagLabel
+
     def appendTag(self,tagname,tagnumber):
         mLabel = tk.Label(self,text="{} : ({})".format(tagname,tagnumber))
         mLabel.grid()
