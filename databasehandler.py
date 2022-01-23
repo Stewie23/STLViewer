@@ -22,6 +22,7 @@ class DatabaseHandler(object):
         #compare the hashes of the file list against the hashes of the table
         #hash exists -> check name and folder and change
         #hash does not exist -> create new entry
+        #Todo: change so works together with progress bar
         for entry in mFileList:
             with self.con:
                 self.c.execute("SELECT * FROM Items WHERE hash = ?",[entry[2]])
@@ -32,8 +33,12 @@ class DatabaseHandler(object):
                     #get the id 
                     self.c.execute("SELECT * FROM Items WHERE hash = ?",[entry[2]])
                     data=self.c.fetchall()
-                    thumbnailgenerator.createAutoThumb(str(data[0][0]),entry[1])#create thumbnail with filename beeing the itemID of the object, second argument path to stl.
-                    path = "Thumbnails/{}.jpg".format(str(data[0][0]))
+                    try:
+                        print(entry)
+                        thumbnailgenerator.createAutoThumb(str(data[0][0]),entry[1])#create thumbnail with filename beeing the itemID of the object, second argument path to stl.
+                        path = "Thumbnails/{}.jpg".format(str(data[0][0]))
+                    except:
+                        path = "Thumbnails/error.jpg"
                     self.c.execute("UPDATE Items SET thumbnail = ? WHERE ItemID = ?",(path,data[0][0]))
                 else:# entry exist compare path to see if renamed or moved 
                     if entry[1] != (data[0][2]):#update path 
@@ -182,7 +187,7 @@ class Search(object):
             returnList = fileSearchResults.intersection(tagSearchResults)
         else:
             returnList = fileSearchResults
-        return returnList
+        return list(returnList)
             
 
 

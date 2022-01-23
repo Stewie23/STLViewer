@@ -29,6 +29,7 @@ class FileCrawler(object):
         listOfFiles = list(pathlib.Path(self.folder).glob('**/*.stl'))
         for file in listOfFiles:
             filename = os.path.basename(file).split(".")[0]#os.path.basename only works for windows apperantly
+            print(filename)
             with open(file, "rb") as f:
                 file_hash = hashlib.blake2b()
                 while chunk := f.read(8192):
@@ -43,6 +44,7 @@ class FileCrawler(object):
             progressbar["value"] += 1
             progressbar.update()
         doubleLog.close()
+        print("file crawling done")
         return self.MySTLList
 
     def checkDouble(self,hash):

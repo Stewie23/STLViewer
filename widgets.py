@@ -9,10 +9,14 @@ except:
 
 import os
 import subprocess
+from tracemalloc import start
+from turtle import forward
 import thumbnailgenerator
 import filecrawler
 from tkinter import filedialog,messagebox
 import json
+import math
+from PIL import Image, ImageTk
 FILEBROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')#only works for windows
 
 class Thumbnail(tk.Frame):
@@ -31,16 +35,19 @@ class Thumbnail(tk.Frame):
         self.mImage.grid()
 
         self.mText = tk.StringVar()
+        #TODO: find a way to limit tag size to a fixed size
         self.mName = tk.Label(self,textvariable=self.mText,wraplength=150)
         
 
         self.mName.grid()
 
 class TagList(tk.Frame):
+    #TODO: Add scroolbar
     #a frame holding a list of tags, implemented as a separte widget for easier manipulation
-    def __init__(self,parent,*args,**options):
+    def __init__(self,parent,root,*args,**options):
         tk.Frame.__init__(self,parent)
         tk.Label(self,text="Tags").grid()
+        self.root = root
     
     def clearTags(self):
         for widget in self.winfo_children():
@@ -55,130 +62,142 @@ class TagList(tk.Frame):
     def appendTag(self,tagname,tagnumber):
         mLabel = tk.Label(self,text="{} : ({})".format(tagname,tagnumber))
         mLabel.grid()
-        #add command to do a search for that tag
+        self.checkSize()
         return mLabel
-
-class VerticalScrollFrame(ttk.Frame):
-    """A ttk frame allowing vertical scrolling only.
-    Use the '.interior' attribute to place widgets inside the scrollable frame.
-    Adapted from https://gist.github.com/EugeneBakin/76c8f9bcec5b390e45df.
-    Amendments:
-    1. Original logic for configuring the interior frame and canvas
-       scrollregion left canvas regions exposed (not suppose to) and allowed
-       vertical scrolling even when canvas height is greater than the canvas
-       required height, respectively. I have provided a new logic to
-       resolve these issues.
-    2. Provided options to configure the styles of the ttk widgets.
-    3. Tested in Python 3.5.2 (default, Nov 23 2017, 16:37:01),
-                 Python 2.7.12 (default, Dec  4 2017, 14:50:18) and
-                 [GCC 5.4.0 20160609] on linux.
-    Author: Sunbear
-    Website: https://github.com/sunbearc22
-    Created on: 2018-02-26
-    Amended on: 2018-03-01 - corrected __configure_canvas_interiorframe() logic.  
-    """
-
     
-    def __init__(self, parent, *args, **options):
-        """
-        WIDGET-SPECIFIC OPTIONS:
-           style, pri_background, sec_background, arrowcolor,
-           mainborderwidth, interiorborderwidth, mainrelief, interiorrelief 
-        """
-        # Extract key and value from **options using Python3 "pop" function:
-        #   pop(key[, default])
-        style          = options.pop('style',ttk.Style())
-        pri_background = options.pop('pri_background','light grey')
-        sec_background = options.pop('sec_background','grey70')
-        arrowcolor     = options.pop('arrowcolor','black')
-        mainborderwidth     = options.pop('mainborderwidth', 0)
-        interiorborderwidth = options.pop('interiorborderwidth', 0)
-        mainrelief          = options.pop('mainrelief', 'flat')
-        interiorrelief      = options.pop('interiorrelief', 'flat')
-
-        ttk.Frame.__init__(self, parent, style='main.TFrame',
-                           borderwidth=mainborderwidth, relief=mainrelief)
-
-        self.__setStyle(style, pri_background, sec_background, arrowcolor)
-
-        self.__createWidgets(mainborderwidth, interiorborderwidth,
-                             mainrelief, interiorrelief,
-                             pri_background)
-        self.__setBindings()
-
-
-    def __setStyle(self, style, pri_background, sec_background, arrowcolor):
-        '''Setup stylenames of outer frame, interior frame and verticle
-           scrollbar'''        
-        style.configure('main.TFrame', background=pri_background)
-        style.configure('interior.TFrame', background=pri_background)
-        style.configure('canvas.Vertical.TScrollbar', background=pri_background,
-                        troughcolor=sec_background, arrowcolor=arrowcolor)
-
-        style.map('canvas.Vertical.TScrollbar',
-            background=[('active',pri_background),('!active',pri_background)],
-            arrowcolor=[('active',arrowcolor),('!active',arrowcolor)])
-
-
-    def __createWidgets(self, mainborderwidth, interiorborderwidth,
-                        mainrelief, interiorrelief, pri_background):
-        '''Create widgets of the scroll frame.'''
-        self.vscrollbar = ttk.Scrollbar(self, orient='vertical',
-                                        style='canvas.Vertical.TScrollbar')
-        self.vscrollbar.pack(side='right', fill='y', expand='false')
-        self.canvas = tk.Canvas(self,
-                                bd=0, #no border
-                                highlightthickness=0, #no focus highlight
-                                yscrollcommand=self.vscrollbar.set,#use self.vscrollbar
-                                background=pri_background #improves resizing appearance
-                                )
-        self.canvas.pack(side='left', fill='both', expand='true')
-        self.vscrollbar.config(command=self.canvas.yview)
-
-        # reset the view
-        self.canvas.xview_moveto(0)
-        self.canvas.yview_moveto(0)
-
-        # create a frame inside the canvas which will be scrolled with it
-        self.interior = ttk.Frame(self.canvas,
-                                  style='interior.TFrame',
-                                  borderwidth=interiorborderwidth,
-                                  relief=interiorrelief)
-        self.interior_id = self.canvas.create_window(0, 0,
-                                                     window=self.interior,
-                                                     anchor='nw')
-
-
-    def __setBindings(self):
-        '''Activate binding to configure scroll frame widgets.'''
-        self.canvas.bind('<Configure>',self.__configure_canvas_interiorframe)
-        
-
-    def __configure_canvas_interiorframe(self, event):
-        '''Configure the interior frame size and the canvas scrollregion'''
-        #Force the update of .winfo_width() and winfo_height()
-        self.canvas.update_idletasks() 
-
-        #Internal parameters 
-        interiorReqHeight= self.interior.winfo_reqheight()
-        canvasWidth    = self.canvas.winfo_width()
-        canvasHeight   = self.canvas.winfo_height()
-
-        #Set interior frame width to canvas current width
-        self.canvas.itemconfigure(self.interior_id, width=canvasWidth)
-        
-        # Set interior frame height and canvas scrollregion
-        if canvasHeight > interiorReqHeight:
-            #print('canvasHeight > interiorReqHeight')
-            self.canvas.itemconfigure(self.interior_id,  height=canvasHeight)
-            self.canvas.config(scrollregion="0 0 {0} {1}".
-                               format(canvasWidth, canvasHeight))
+    def checkSize(self):
+        self.update()
+        self.root.update()
+        myHeight = self.winfo_height()
+        screenHeight = self.root.winfo_height()
+        if screenHeight - myHeight >= 100:
+            return True
         else:
-            #print('canvasHeight <= interiorReqHeight')
-            self.canvas.itemconfigure(self.interior_id, height=interiorReqHeight)
-            self.canvas.config(scrollregion="0 0 {0} {1}".
-                               format(canvasWidth, interiorReqHeight))
+            return False
 
+class ThumbnailView(ttk.Frame):
+    #replacement for the old VerticalScrollFrame
+    def __init__(self,parent,*args,**options):
+        tk.Frame.__init__(self,parent)
+        self.num_elements = 0
+        self.max_col = 0
+        self.max_row = 0
+        self.ThumbsOnPage = 0
+        self.currentPage = 1
+        self.Pages = 1
+        self.thumbList = []
+        self.Datatabase = None
+
+        # add navigation bar
+        self.butstart = tk.Button(self,text="<<",width=10)
+        self.butstart.bind("<Button-1>",self.start)
+
+        self.butbackwards = tk.Button(self,text="<",width=10)
+        self.butbackwards.bind("<Button-1>",self.back)
+        self.currentPositionText = tk.StringVar()
+        self.currentPositionText.set("1")
+        self.currentPosition = tk.Entry(self,textvariable=self.currentPositionText,width=10)
+
+        self.maxPositionText = tk.StringVar()
+        self.maxPositionText.set("")
+        self.maxPosition = tk.Label(self,textvariable=self.maxPositionText,width=10)
+
+        self.butforward = tk.Button(self,text=">",width=10)
+        self.butforward.bind("<Button-1>",self.forward)
+
+        self.butend = tk.Button(self,text=">>",width=10)
+        self.butend.bind("<Button-1>",self.end)
+
+        self.butstart.grid(row=0,column=0)
+        self.butbackwards.grid(row=0,column=1)
+        self.currentPosition.grid(row=0,column=2)
+        self.maxPosition.grid(row=0,column=3)
+        self.butforward.grid(row=0,column=4)
+        self.butend.grid(row=0,column=5)
+
+    def setFiles(self,files):
+        self.files = files    
+        self.displayThumbnails()
+
+    def setDatabase(self,database):
+        self.Datatabase = database
+    def displayThumbnails(self):
+        #clear thumbnails
+        for item in self.thumbList:
+            item.destroy()
+        self.thumbList =[]
+      
+        self.calculateRowsAndColumns()
+
+        self.Pages = math.ceil(len(self.files)/self.ThumbsOnPage)
+        self.maxPositionText.set(self.Pages)
+
+        n = 0 
+        row_num = 1
+        col_num = 0
+
+        while n < self.ThumbsOnPage:
+            if n + (self.ThumbsOnPage * (self.currentPage -1)) >= len(self.files):
+                break
+            if col_num == self.max_col:
+                col_num = 0
+                row_num +=1
+
+            image = Image.open(self.files[n + (self.ThumbsOnPage * (self.currentPage -1))][2])
+            image = image.resize((150, 150), Image.ANTIALIAS)
+            photo = ImageTk.PhotoImage(image)
+            l = Thumbnail(self,self.files[n + (self.ThumbsOnPage * (self.currentPage -1))][0],image=photo)
+            l.mImage.image = photo#reference keeping
+            l.mText.set(self.files[n + (self.ThumbsOnPage * (self.currentPage -1))][1])
+            l.grid(row = row_num,column=col_num,sticky=tk.N+tk.S)
+            l.mImage.bind("<Button-1>",self.callbackLabel)
+            l.mName.bind("<Button-1>",self.callbackLabel)
+
+            self.thumbList.append(l)
+            col_num +=1
+            n +=1
+        
+
+    def calculateRowsAndColumns(self):
+        #based on frame size calculate the number of thumbs to display
+        self.max_col = math.floor(self.winfo_width()/150)
+        self.max_row = math.floor(self.winfo_height()/(150 +75))
+        self.ThumbsOnPage = self.max_col * self.max_row
+        #avoid division by zero
+        if self.ThumbsOnPage == 0:
+            self.ThumbsOnPage = 1
+
+    def set_NumberOfElements(self,number):
+        self.num_elements = int(number)
+
+    def get_NumberOfElements(self):
+        return self.num_elements
+   
+    def start(self,event):
+        self.currentPage = 1
+        self.currentPositionText.set(self.currentPage)
+        self.displayThumbnails()
+
+    def back(self,event):
+        if self.currentPage > 1:
+            self.currentPage -= 1
+            self.currentPositionText.set(self.currentPage)
+            self.displayThumbnails()
+
+    def forward(self,event):
+        if self.currentPage < self.Pages:
+            self.currentPage += 1
+            self.currentPositionText.set(self.currentPage)
+            self.displayThumbnails()
+
+    def end(self,event):
+        self.currentPage = self.Pages
+        self.currentPositionText.set(self.currentPage)
+        self.displayThumbnails()
+
+    def callbackLabel(self,event):
+        MyDialog(self,self.Datatabase,event.widget.master.itemID,event.widget.master)#also pass the itemID to the dialog
+        
 class Dialog(tk.Toplevel):
     #a base class for dialog windows
     # https://effbot.org/tkinterbook/tkinter-dialog-windows.htm
@@ -323,11 +342,16 @@ class SettingsDialog(Dialog):
 
         c = tk.Checkbutton(master, text="Crawl on Startup", variable=self.CrawlVar)
         c.grid()
+        #number of tags    
+        tk.Label(master,text="Number of Tags to Display in Sidebar:").grid(row=1,column=0)
+        self.NumberOfTags = tk.Entry(master)
+        self.NumberOfTags.grid(row=1,column=1)
+
         #folder to crawl
         self.directory = self.config["Folder"]
-        tk.Label(master,text="Folder to Crawl:").grid(row=1,column=0)
+        tk.Label(master,text="Folder to Crawl:").grid(row=2,column=0)
         self.Button = tk.Button(master,text=self.directory,command=self.selectFile)
-        self.Button.grid(row=1,column=1)
+        self.Button.grid(row=2,column=1)
 
     def selectFile(self):
         self.directory = filedialog.askdirectory()
@@ -363,6 +387,7 @@ class CrawlingDialog(Dialog):
 
     def apply(self):
         mFileList = self.mFileCrawler.crawl(self.progressbar)
+        #todo: add an info that crawling is done, database  gets updated now
         self.mDatabaseHandler.UpdateItemTable(mFileList)
 
 
