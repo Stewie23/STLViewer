@@ -8,7 +8,7 @@ import filecrawler
 import databasehandler
 import os
 import json
-import vtkmodules
+import vtkmodules.all
 
 class App:
 

@@ -297,6 +297,7 @@ class MyDialog(Dialog):
     def body(self,master):
         self.mButtonExplorer = tk.Button(master,text="Reveale in File Explorer",command=self.showExplorer).grid(row=0)
         self.mButtonThumb = tk.Button(master,text="Edit Thumbnail",command=self.editThumbnail).grid(row=1)
+        #Tag list
         tk.Label(master,text="Tags (Seperated by ,):").grid(row=2)
         self.mTags = tk.Text(master,height=3,width=75)
         self.mTags.grid(row=3)
@@ -306,12 +307,27 @@ class MyDialog(Dialog):
             mTagsText += entry + ","
         mTagsText = mTagsText.rstrip(",")
         self.mTags.insert(1.0,mTagsText)
+        #Release Field
+        tk.Label(master,text="Release:").grid(row=4)
+        self.mRelease = tk.Text(master,height=1,width=75)
+        self.mRelease.grid(row=5)
+        releaseText = self.databaseHandler.getReleaseByID(self.itemID)
+        self.mRelease.insert(1.0,releaseText)
+        #Comments
+        tk.Label(master,text="Comments:").grid(row=6)
+        self.mComments = tk.Text(master,height=3,width=75)
+        self.mComments.grid(row=7)
+        
 
 
     def apply(self):
         text = self.mTags.get("1.0",tk.END)
         tagList = text.split(",")
         self.databaseHandler.setTagsByID(self.itemID,tagList)
+
+        release = self.mRelease.get("1.0",tk.END)
+        self.databaseHandler.setReleaseByID(self.itemID,release)
+        #TODO: update sidebar!        
 
 
     def showExplorer(self):

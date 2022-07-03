@@ -17,6 +17,7 @@ class DatabaseHandler(object):
        
         self.c.execute('create table if not exists "Items" (itemID INTEGER PRIMARY KEY, name String, path String,hash String,thumbnail String,found INTEGER DEFAULT 0)')
         self.c.execute('create table if not exists "Taggins" (itemID integer, tag String)')
+        self.c.execute('create table if not exists "Release" (itemID integer, release String)')
 
     def UpdateItemTable(self, mFileList):
         #compare the hashes of the file list against the hashes of the table
@@ -80,12 +81,17 @@ class DatabaseHandler(object):
         return returnList
 
     def searchByTag(self,tag):
-        #get itemID with that tag from taggins
         returnList = []
+        #get itemID with that tag from taggins
         with self.con:
             self.c.execute("SELECT itemID FROM Taggins WHERE tag =? COLLATE NOCASE",[tag])
             data = self.c.fetchall()
             idList = []
+            for entry in data:
+                idList.append(entry[0])
+        #also search in release (for search purposes handle them just as tags)
+            self.c.execute("SELECT itemID FROM Release WHERE release =? COLLATE NOCASE",[tag])
+            data = self.c.fetchall()
             for entry in data:
                 idList.append(entry[0])
         #get items by id from items table
@@ -128,6 +134,18 @@ class DatabaseHandler(object):
         for tag in tagList:
             with self.con:
                 self.c.execute("INSERT INTO Taggins(itemID,tag) VALUES (?,?)",(mID,tag.strip()))
+
+    def setReleaseByID(self,mID,release):
+        #delete old tag entrys for this id
+        with self.con:
+            self.c.execute("DELETE FROM Release WHERE itemID =?",[mID])
+            self.c.execute("INSERT INTO Release(itemID,release) VALUES (?,?)",(mID,release.strip()))
+
+    def getReleaseByID(self,mID):
+        with self.con:
+            self.c.execute("SELECT release FROM Release WHERE itemID =?",[mID])
+            data = self.c.fetchall()
+        return data
 
     def getTagNumbers(self):
         #get Tag + how often it is used
