@@ -11,6 +11,7 @@ class DatabaseHandler(object):
         self.con = sl.connect('stlDatabase.db')
         self.c = self.con.cursor()
         self.checkTables()
+        self.deleteEmpty()
 
     #if tables not exist create them, mostly needed for the first startup
     def checkTables(self):
@@ -19,6 +20,41 @@ class DatabaseHandler(object):
         self.c.execute('create table if not exists "Taggins" (itemID integer, tag String)')
         self.c.execute('create table if not exists "Release" (itemID integer, release String)')
         self.c.execute('create table if not exists "Comments" (itemID integer, comments String)')
+
+    def deleteEmpty(self):
+        #clean up taggins,releases and comments where its just an ID and no entrys
+         with self.con:
+            #taggings
+            self.c.execute("SELECT itemID FROM Taggins WHERE tag =? COLLATE NOCASE",[""])
+            data = self.c.fetchall()
+            idList = []
+            for entry in data:
+                idList.append(entry[0])
+
+            for entry in idList:
+                 self.c.execute("DELETE FROM Taggins WHERE itemID =?",[entry])
+
+            #releases
+            self.c.execute("SELECT itemID FROM Release WHERE release =? COLLATE NOCASE",[""])
+            data = self.c.fetchall()
+            idList = []
+            for entry in data:
+                idList.append(entry[0])
+
+            for entry in idList:
+                 self.c.execute("DELETE FROM Release WHERE itemID =?",[entry])
+            
+            #Comments
+            self.c.execute("SELECT itemID FROM Comments WHERE comments =? COLLATE NOCASE",[""])
+            data = self.c.fetchall()
+            idList = []
+            for entry in data:
+                idList.append(entry[0])
+
+            for entry in idList:
+                 self.c.execute("DELETE FROM Comments WHERE itemID =?",[entry])
+
+            
 
     def UpdateItemTable(self, mFileList):
         #compare the hashes of the file list against the hashes of the table
@@ -141,7 +177,9 @@ class DatabaseHandler(object):
         #delete old tag entrys for this id
         with self.con:
             self.c.execute("DELETE FROM Release WHERE itemID =?",[mID])
-            self.c.execute("INSERT INTO Release(itemID,release) VALUES (?,?)",(mID,release.strip()))
+            #if release is not "" insert new table
+            if release.strip() != "":
+                self.c.execute("INSERT INTO Release(itemID,release) VALUES (?,?)",(mID,release.strip()))
 
     def getReleaseByID(self,mID):
         with self.con:
@@ -156,7 +194,8 @@ class DatabaseHandler(object):
         #delete old tag entrys for this id
         with self.con:
             self.c.execute("DELETE FROM Comments  WHERE itemID =?",[mID])
-            self.c.execute("INSERT INTO Comments (itemID,comments) VALUES (?,?)",(mID,comment.strip()))
+            if comment.strip() != " ":
+                self.c.execute("INSERT INTO Comments (itemID,comments) VALUES (?,?)",(mID,comment.strip()))
 
     def getCommentsByID(self,mID):
         with self.con:
