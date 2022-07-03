@@ -171,7 +171,8 @@ class DatabaseHandler(object):
             self.c.execute("DELETE FROM Taggins WHERE itemID =?",[mID])
         for tag in tagList:
             with self.con:
-                self.c.execute("INSERT INTO Taggins(itemID,tag) VALUES (?,?)",(mID,tag.strip()))
+                if tag.strip != "":
+                    self.c.execute("INSERT INTO Taggins(itemID,tag) VALUES (?,?)",(mID,tag.strip()))
 
     def setReleaseByID(self,mID,release):
         #delete old tag entrys for this id
@@ -194,7 +195,7 @@ class DatabaseHandler(object):
         #delete old tag entrys for this id
         with self.con:
             self.c.execute("DELETE FROM Comments  WHERE itemID =?",[mID])
-            if comment.strip() != " ":
+            if comment.strip() != "":
                 self.c.execute("INSERT INTO Comments (itemID,comments) VALUES (?,?)",(mID,comment.strip()))
 
     def getCommentsByID(self,mID):
