@@ -206,7 +206,7 @@ class Search(object):
         returnList = []
         tagSearchResults = set()
         #find any tag searches in the query 
-        tagsToSearch = re.findall(r"\[([ A-Za-z0-9_]+)\]", term)
+        tagsToSearch = re.findall(r"\[([ A-Za-z0-9_\-]+)\]", term)
         for tag in tagsToSearch:
             if len(tagSearchResults) == 0:
                 tagSearchResults = set(self.databasemanager.searchByTag(tag))
@@ -215,7 +215,7 @@ class Search(object):
        
 
         #remove them from the term
-        term = re.sub(r"\[([ A-Za-z0-9_]+)\]","",term)
+        term = re.sub(r"\[([ A-Za-z0-9_\-]+)\]","",term)
        
         #search with the reminder for filenames           
         fileSearchResults = set(self.databasemanager.searchFilebyName("%{}%".format(term.strip())))
