@@ -307,19 +307,21 @@ class MyDialog(Dialog):
             mTagsText += entry + ","
         mTagsText = mTagsText.rstrip(",")
         self.mTags.insert(1.0,mTagsText)
+        
         #Release Field
         tk.Label(master,text="Release:").grid(row=4)
         self.mRelease = tk.Text(master,height=1,width=75)
         self.mRelease.grid(row=5)
         releaseText = self.databaseHandler.getReleaseByID(self.itemID)
         self.mRelease.insert(1.0,releaseText)
+        
         #Comments
         tk.Label(master,text="Comments:").grid(row=6)
         self.mComments = tk.Text(master,height=3,width=75)
         self.mComments.grid(row=7)
+        commentsText = self.databaseHandler.getCommentsByID(self.itemID)
+        self.mComments.insert(1.0,commentsText)
         
-
-
     def apply(self):
         text = self.mTags.get("1.0",tk.END)
         tagList = text.split(",")
@@ -327,8 +329,10 @@ class MyDialog(Dialog):
 
         release = self.mRelease.get("1.0",tk.END)
         self.databaseHandler.setReleaseByID(self.itemID,release)
-        #TODO: update sidebar!        
 
+        comment = self.mComments.get("1.0",tk.END)
+        self.databaseHandler.setCommentsByID(self.itemID,comment)
+        #TODO: update sidebar!        
 
     def showExplorer(self):
         path = self.databaseHandler.getPathbyID(self.itemID)[0]

@@ -13,9 +13,9 @@ Deleted or edited files, as editing would change their hash,will be removed from
 
 * Automaticaly Generates a Preview Picture, since this will often be from a wierd angle, the picture can be manualy edited. 
 
-* Allows to asign Tags to Files
+* Allows to asign mutiple Tags to Files. Files also can have a Release and Comments assigend to them.
 
-* Search for Tags via  []
+* Search for Tags/Releases via  []
 
 * Search within filenames
 
@@ -27,4 +27,4 @@ Deleted or edited files, as editing would change their hash,will be removed from
 
 **Known Problems:**
 
-* Having a manual Thumbwindow open an manipulating the Dialogmenu does not work well
+* Having a manual Thumbwindow open and manipulating the Dialogmenu does not work well

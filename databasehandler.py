@@ -18,6 +18,7 @@ class DatabaseHandler(object):
         self.c.execute('create table if not exists "Items" (itemID INTEGER PRIMARY KEY, name String, path String,hash String,thumbnail String,found INTEGER DEFAULT 0)')
         self.c.execute('create table if not exists "Taggins" (itemID integer, tag String)')
         self.c.execute('create table if not exists "Release" (itemID integer, release String)')
+        self.c.execute('create table if not exists "Comments" (itemID integer, comments String)')
 
     def UpdateItemTable(self, mFileList):
         #compare the hashes of the file list against the hashes of the table
@@ -90,6 +91,7 @@ class DatabaseHandler(object):
             for entry in data:
                 idList.append(entry[0])
         #also search in release (for search purposes handle them just as tags)
+            print(tag)
             self.c.execute("SELECT itemID FROM Release WHERE release =? COLLATE NOCASE",[tag])
             data = self.c.fetchall()
             for entry in data:
@@ -145,7 +147,25 @@ class DatabaseHandler(object):
         with self.con:
             self.c.execute("SELECT release FROM Release WHERE itemID =?",[mID])
             data = self.c.fetchall()
-        return data
+        returnString =""
+        for element in data:
+            returnString += element[0] + " "
+        return returnString
+  
+    def setCommentsByID(self,mID,comment):
+        #delete old tag entrys for this id
+        with self.con:
+            self.c.execute("DELETE FROM Comments  WHERE itemID =?",[mID])
+            self.c.execute("INSERT INTO Comments (itemID,comments) VALUES (?,?)",(mID,comment.strip()))
+
+    def getCommentsByID(self,mID):
+        with self.con:
+            self.c.execute("SELECT comments FROM Comments WHERE itemID =?",[mID])
+            data = self.c.fetchall()
+        returnString =""
+        for element in data:
+            returnString += element[0] + " "
+        return returnString
 
     def getTagNumbers(self):
         #get Tag + how often it is used
@@ -186,7 +206,7 @@ class Search(object):
         returnList = []
         tagSearchResults = set()
         #find any tag searches in the query 
-        tagsToSearch = re.findall(r"\[([A-Za-z0-9_]+)\]", term)
+        tagsToSearch = re.findall(r"\[([ A-Za-z0-9_]+)\]", term)
         for tag in tagsToSearch:
             if len(tagSearchResults) == 0:
                 tagSearchResults = set(self.databasemanager.searchByTag(tag))
@@ -195,7 +215,7 @@ class Search(object):
        
 
         #remove them from the term
-        term = re.sub(r"\[([A-Za-z0-9_]+)\]","",term)
+        term = re.sub(r"\[([ A-Za-z0-9_]+)\]","",term)
        
         #search with the reminder for filenames           
         fileSearchResults = set(self.databasemanager.searchFilebyName("%{}%".format(term.strip())))
