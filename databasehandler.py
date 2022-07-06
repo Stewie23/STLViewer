@@ -171,6 +171,7 @@ class DatabaseHandler(object):
             self.c.execute("DELETE FROM Taggins WHERE itemID =?",[mID])
         for tag in tagList:
             with self.con:
+                #TODO: does not behave as intended, empty tags are still in the database
                 if tag.strip != "":
                     self.c.execute("INSERT INTO Taggins(itemID,tag) VALUES (?,?)",(mID,tag.strip()))
 

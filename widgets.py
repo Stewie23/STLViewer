@@ -48,11 +48,14 @@ class TagList(tk.Frame):
         tk.Frame.__init__(self,parent)
         tk.Label(self,text="Tags").grid()
         self.root = root
+        self.NumberOfTags = 1
     
     def clearTags(self):
+        self.NumberOfTags = 1
         for widget in self.winfo_children():
             widget.destroy()
         tk.Label(self,text="Tags").grid()
+        
 
     def setNoTags(self,number):
         noTagLabel = tk.Label(self,text="Items Without Tag: {}".format(number))
@@ -60,21 +63,31 @@ class TagList(tk.Frame):
         return noTagLabel
 
     def appendTag(self,tagname,tagnumber):
-        mLabel = tk.Label(self,text="{} : ({})".format(tagname,tagnumber))
-        mLabel.grid()
-        self.checkSize()
-        return mLabel
-    
+        self.NumberOfTags +=1
+        if self.checkSize() == True:
+            mLabel = tk.Label(self,text="{} : ({})".format(tagname,tagnumber))
+            mLabel.grid()
+            return mLabel
+        else:
+            return None
+ 
     def checkSize(self):
+        #label is 21px heigh 
+        #63px is height of other elements
+        #TODO: calculate label height not use pre measurment
+        
         self.update()
         self.root.update()
         myHeight = self.winfo_height()
         screenHeight = self.root.winfo_height()
-        if screenHeight - myHeight >= 100:
-            return True
-        else:
-            return False
 
+        tagsPerPage = (screenHeight - 63)/21
+        print("Tags " + str(self.NumberOfTags) + " of " + str(tagsPerPage) + " Screensize: " + str(screenHeight))
+        if self.NumberOfTags > tagsPerPage:
+            return False
+        else:
+            return True
+  
 class ThumbnailView(ttk.Frame):
     #replacement for the old VerticalScrollFrame
     def __init__(self,parent,*args,**options):

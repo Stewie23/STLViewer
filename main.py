@@ -10,11 +10,15 @@ import os
 import json
 import vtkmodules.all
 
-class App:
+class App():
 
     def __init__(self,root):
         self.oldHeight = 800
         self.go = False
+
+        #timer for resizing events
+        self._after_id = None
+
         def SettingsDialog():
              widgets.SettingsDialog(self.root,self.config)#also pass the itemID to the dialog
             
@@ -131,6 +135,7 @@ class App:
         self.left_frame.setFiles(listOfFiles)
 
     def updateSidebar(self):
+        print("Update Sidebar")
         self.TagWidget.clearTags()
         #updating the list of tags and their numbers
         tags = self.mDatabaseHandler.getTagNumbers()
@@ -138,11 +143,30 @@ class App:
         noTagLable.bind("<Button-1>",self.NoTagSearch)
         for entry in tags:
             Label = self.TagWidget.appendTag(entry[0],entry[1])
-            Label.bind("<Button-1>",self.doSearch)
+            if Label == None:
+                break
+            else:
+                Label.bind("<Button-1>",self.doSearch)
 
     def resizeEvent(self,event):
+        #added delay of 2 seconds to avoid constant redrawing
+        if self._after_id:
+            self.root.after_cancel(self._after_id)
+        self._after_id = self.root.after(2000, self.redraw)
         self.left_frame.calculateRowsAndColumns()
-        pass
+
+    def redraw(self): 
+        #further check to avoid unneeded redrawings
+        if self.oldHeight != self.root.winfo_height(): 
+            #change the tag list 
+            self.oldHeight = self.root.winfo_height()  
+            self.updateSidebar()
+
+
+       
+  
+
+
 
 
 
