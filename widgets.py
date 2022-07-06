@@ -47,6 +47,8 @@ class TagList(tk.Frame):
     def __init__(self,parent,root,*args,**options):
         tk.Frame.__init__(self,parent)
         tk.Label(self,text="Tags").grid()
+        # add two arrow buttons besides tags for navigating forward and backwarts
+        
         self.root = root
         self.NumberOfTags = 1
     

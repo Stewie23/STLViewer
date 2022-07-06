@@ -61,8 +61,8 @@ class App():
         self.right_frame = tk.Frame(root)
         self.right_frame.grid(row=1,column=1,sticky="nw")
         #display # of search results
-        self.resultNumLable = tk.Label(self.right_frame, text="Results:")
-        self.resultNumLable.grid()
+        #self.resultNumLable = tk.Label(self.right_frame, text="Results:")
+        #self.resultNumLable.grid()
         #tag widget
         self.TagWidget = widgets.TagList(self.right_frame,self.root)
         self.TagWidget.grid()
